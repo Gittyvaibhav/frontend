@@ -1,13 +1,10 @@
 const getApiBase = () => {
-  if (process.env.REACT_APP_API_BASE_URL) {
-    return process.env.REACT_APP_API_BASE_URL;
+  const envBase =
+    process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_API_URL;
+  if (envBase) {
+    return envBase;
   }
-  if (
-    typeof window !== "undefined" &&
-    window.location &&
-    window.location.origin &&
-    window.location.origin.includes("localhost")
-  ) {
+  if (process.env.NODE_ENV === "development") {
     return "http://localhost:5000";
   }
   return "";

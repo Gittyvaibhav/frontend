@@ -78,6 +78,11 @@ const WorkoutPlanner = () => {
   const [calendarStartTime, setCalendarStartTime] = useState("07:00");
   const [showFilters, setShowFilters] = useState(false);
 
+  const getAuthConfig = () => {
+    const token = localStorage.getItem("auth_token");
+    return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+  };
+
   useEffect(() => {
     setPage(1);
   }, [filters, debouncedSearch]);
@@ -139,7 +144,8 @@ const WorkoutPlanner = () => {
       if (filters.sort) params.set("sort", filters.sort);
 
       const res = await axios.get(
-        `${API_BASE}/api/workout/ai-plans?${params.toString()}`
+        `${API_BASE}/api/workout/ai-plans?${params.toString()}`,
+        getAuthConfig()
       );
       const payload = res.data || {};
       setSavedPlans(payload.data || []);
@@ -259,7 +265,11 @@ const WorkoutPlanner = () => {
         timePerSession: Number(form.timePerSession),
         targetMuscleGroups: form.targetMuscleGroups,
       };
-      const res = await axios.post(`${API_BASE}/api/workout/ai-plan`, payload);
+      const res = await axios.post(
+        `${API_BASE}/api/workout/ai-plan`,
+        payload,
+        getAuthConfig()
+      );
       setPlan(res.data);
       fetchSavedPlans();
     } catch (err) {
@@ -299,9 +309,11 @@ const WorkoutPlanner = () => {
       return;
     }
     try {
-      await axios.patch(`${API_BASE}/api/workout/ai-plans/${id}`, {
-        title: renameValue.trim(),
-      });
+      await axios.patch(
+        `${API_BASE}/api/workout/ai-plans/${id}`,
+        { title: renameValue.trim() },
+        getAuthConfig()
+      );
       cancelRename();
       fetchSavedPlans();
       setError("");
@@ -314,7 +326,10 @@ const WorkoutPlanner = () => {
     const ok = window.confirm("Delete this saved plan?");
     if (!ok) return;
     try {
-      await axios.delete(`${API_BASE}/api/workout/ai-plans/${id}`);
+      await axios.delete(
+        `${API_BASE}/api/workout/ai-plans/${id}`,
+        getAuthConfig()
+      );
       fetchSavedPlans();
     } catch (err) {
       setError("Failed to delete plan.");
@@ -325,7 +340,8 @@ const WorkoutPlanner = () => {
     try {
       await axios.patch(
         `${API_BASE}/api/workout/ai-plans/${saved._id}/favorite`,
-        { favorite: !saved.favorite }
+        { favorite: !saved.favorite },
+        getAuthConfig()
       );
       fetchSavedPlans();
     } catch (err) {

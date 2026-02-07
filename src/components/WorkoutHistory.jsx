@@ -3,7 +3,7 @@ import getApiBase from "../utils/apiBase";
 
 const API_BASE = getApiBase();
 
-const WorkoutHistory = () => {
+const WorkoutHistory = ({ authToken }) => {
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -11,12 +11,22 @@ const WorkoutHistory = () => {
   useEffect(() => {
     const fetchWorkouts = async () => {
       try {
+        if (!authToken) {
+          setError("Please log in to view workout history.");
+          setWorkouts([]);
+          setLoading(false);
+          return;
+        }
+
         setLoading(true);
         setError(null);
 
         const response = await fetch(`${API_BASE}/api/workout`, {
           method: "GET",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
           timeout: 10000,
         });
 
@@ -40,7 +50,7 @@ const WorkoutHistory = () => {
 
     const interval = setInterval(fetchWorkouts, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [authToken]);
 
   return (
     <div style={{ marginTop: "40px", padding: "20px" }}>

@@ -36,10 +36,15 @@ export class RepCounter {
 // Backend session helpers
 const API_BASE = getApiBase();
 
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("auth_token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
 export async function startSession(exercise) {
   const res = await fetch(`${API_BASE}/api/workout/session`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify({ exercise }),
   });
   if (!res.ok) throw new Error('Failed to start session');
@@ -49,7 +54,7 @@ export async function startSession(exercise) {
 export async function updateSession(sessionId, updates) {
   const res = await fetch(`${API_BASE}/api/workout/session/${sessionId}`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify(updates),
   });
   if (!res.ok) throw new Error('Failed to update session');
@@ -59,7 +64,7 @@ export async function updateSession(sessionId, updates) {
 export async function completeSession(sessionId, finalData = {}) {
   const res = await fetch(`${API_BASE}/api/workout/session/${sessionId}/complete`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify(finalData),
   });
   if (!res.ok) throw new Error('Failed to complete session');

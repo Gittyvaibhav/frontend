@@ -32,10 +32,12 @@ const Nutrition = () => {
     try {
       // 🤖 USE HUGGING FACE LLAMA 3.1 8B INSTRUCT
       console.log("🤖 Generating AI diet plan from Hugging Face (meta-llama/Llama-3.1-8B-Instruct:cheapest)...");
+      const token = localStorage.getItem("auth_token");
       const response = await fetch(`${API_BASE}/api/nutrition/generate-plan`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           provider: "huggingface",

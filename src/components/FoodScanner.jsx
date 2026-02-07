@@ -63,11 +63,13 @@ const FoodScanner = () => {
 
       setModelStatus("Analyzing image with AI...");
       
+      const token = localStorage.getItem("auth_token");
       const response = await axios.post(
         `${API_BASE}/api/food/scan`,
         formData,
         {
           // Let Axios set multipart headers with boundary
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
           timeout: 30000, // 30 second timeout
         }
       );

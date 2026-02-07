@@ -40,10 +40,12 @@ const Pushup = () => {
 
   const saveWorkout = async () => {
     try {
+      const token = localStorage.getItem("auth_token");
       await fetch(`${API_BASE}/api/workout`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           exercise: "pushup",
